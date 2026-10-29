@@ -16,7 +16,7 @@ import {
 } from '../services/api';
 
 const PRIMARY_NAV = [
-  { label: 'My Cards', icon: 'dashboard', to: '/cards' }
+  { label: 'My Cards & Rewards', icon: 'credit_card', to: '/cards' }
 ];
 
 export function AppShell() {
@@ -57,6 +57,18 @@ export function AppShell() {
     }
   };
 
+  // Sync cards updated event
+  useEffect(() => {
+    const handleCardsUpdated = (event) => {
+      if (Array.isArray(event.detail)) {
+        const sum = event.detail.reduce((acc, curr) => acc + (curr.points_balance || 0), 0);
+        setTotalPoints(sum);
+      }
+    };
+    window.addEventListener(CARDS_REFRESHED_EVENT, handleCardsUpdated);
+    return () => window.removeEventListener(CARDS_REFRESHED_EVENT, handleCardsUpdated);
+  }, []);
+
   // Load Action Tabs for sidebar
   useEffect(() => {
     fetchActionTabs(BANK_NAME)
@@ -85,7 +97,16 @@ export function AppShell() {
 
   return (
     <div className={`shell ${isCollapsed ? 'collapsed' : ''}`}>
+      {/* Sidebar Navigation */}
       <aside className="sidebar">
+        <div className="sidebar-brand-mini">
+          <img src="/iob_logo.png" alt="IOB" className="sidebar-logo" />
+          <div className="sidebar-brand-text">
+            <span className="sidebar-bank-title">Indian Overseas Bank</span>
+            <span className="sidebar-portal-tag">Rewards Portal</span>
+          </div>
+        </div>
+
         <nav className="sidebar-nav">
           {PRIMARY_NAV.map((item) => (
             <NavLink
@@ -100,7 +121,7 @@ export function AppShell() {
 
           {actionTabs.length > 0 && (
             <div className="nav-section-label">
-              <span className="nav-label">Redeem points</span>
+              <span className="nav-label">Redeem Rewards</span>
             </div>
           )}
 
@@ -131,10 +152,14 @@ export function AppShell() {
         </nav>
 
         <div className="sidebar-footer">
-          <p className="powered-by">Powered by Cheggout</p>
+          <div className="secure-badge-sidebar">
+            <span className="material-icons">verified_user</span>
+            <span>256-Bit Bank Grade Encryption</span>
+          </div>
         </div>
       </aside>
 
+      {/* Main App Wrap */}
       <div className="main-wrap">
         <header className="topbar">
           <div className="topbar-left">
@@ -146,42 +171,44 @@ export function AppShell() {
             >
               <span className="material-icons">menu</span>
             </button>
+
             <div className="brand-icon">
-              <img src={bank.logoUrl || IOB_DEFAULT_LOGO} alt={bank.name || 'IOB'} />
+              <img src="/iob_logo.png" alt="Indian Overseas Bank" />
             </div>
-            <div>
-              <span className="brand-name">{bank.name || 'Cheggout Rewards'}</span>
-              <span className="brand-tagline">Rewards, powered by Cheggout • Live via GitHub Actions 🚀</span>
+
+            <div className="topbar-titles">
+              <span className="brand-name">Indian Overseas Bank</span>
+              <span className="brand-tagline">Credit Card Rewards Portal</span>
             </div>
           </div>
 
           <div className="topbar-right">
+            {/* Points Balance Pill */}
             <div className="points-chip" onClick={() => navigate('/cards')}>
-              <span className="material-icons">stars</span>
+              <span className="material-icons star-gold">stars</span>
               <div className="rewards-text">
-                <span className="rewards-label">Total points</span>
+                <span className="rewards-label">Total Points</span>
                 <span className="rewards-val">
                   {totalPoints === null ? '—' : totalPoints.toLocaleString('en-IN')}
                 </span>
               </div>
             </div>
 
+            {/* Refresh Button */}
             <button
               type="button"
               className="refresh-icon-btn"
               onClick={handleRefresh}
               disabled={isRefreshing}
-              title={isRefreshing ? 'Refreshing…' : 'Refresh points'}
-              aria-label={isRefreshing ? 'Refreshing…' : 'Refresh points'}
+              title={isRefreshing ? 'Refreshing balance…' : 'Refresh points'}
+              aria-label={isRefreshing ? 'Refreshing balance…' : 'Refresh points'}
             >
-              <span
-                className={`material-icons ${isRefreshing ? 'spin' : ''}`}
-                style={{ fontSize: 18 }}
-              >
+              <span className={`material-icons ${isRefreshing ? 'spin' : ''}`}>
                 refresh
               </span>
             </button>
 
+            {/* User Profile Menu */}
             <div className="user-menu-wrap" ref={userMenuRef}>
               <button
                 type="button"
@@ -189,11 +216,14 @@ export function AppShell() {
                 onClick={() => setIsUserMenuOpen((prev) => !prev)}
               >
                 <div className="avatar">
-                  <span className="material-icons">person</span>
+                  <span className="material-icons">account_circle</span>
                 </div>
-                <span className="user-name">
-                  +91 {user?.mobileNumber || ''}
-                </span>
+                <div className="user-text-col">
+                  <span className="user-role-label">Cardholder</span>
+                  <span className="user-name">
+                    +91 {user?.mobileNumber || ''}
+                  </span>
+                </div>
                 <span className="material-icons caret">
                   {isUserMenuOpen ? 'expand_less' : 'expand_more'}
                 </span>
@@ -201,6 +231,11 @@ export function AppShell() {
 
               {isUserMenuOpen && (
                 <div className="user-dropdown">
+                  <div className="dropdown-user-header">
+                    <p className="dd-user-title">Indian Overseas Bank</p>
+                    <p className="dd-user-phone">+91 {user?.mobileNumber}</p>
+                  </div>
+                  <div className="dd-divider" />
                   <button type="button" className="dd-item danger" onClick={handleLogout}>
                     <span className="material-icons">logout</span> Sign Out
                   </button>

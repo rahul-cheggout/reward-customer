@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Common stroke style for crisp UI icons
 const commonStroke = {
   fill: 'none',
   stroke: 'currentColor',
@@ -112,6 +113,66 @@ export function FeatureFlashIcon() {
   );
 }
 
+// Contactless card wave symbol
+export function ContactlessIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M8.5 16.5a6 6 0 0 1 0-9" opacity="0.45" />
+      <path d="M12 19a9.5 9.5 0 0 1 0-14" opacity="0.75" />
+      <path d="M15.5 21.5a13 13 0 0 1 0-19" />
+    </svg>
+  );
+}
+
+// Realistic EMV Gold Chip with circuits
+export function CardChipSvg() {
+  return (
+    <svg viewBox="0 0 38 28" width="38" height="28" fill="none">
+      <defs>
+        <linearGradient id="emvGrad" x1="0" y1="0" x2="38" y2="28" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FDE68A" />
+          <stop offset="0.45" stopColor="#D97706" />
+          <stop offset="0.7" stopColor="#FCD34D" />
+          <stop offset="1" stopColor="#92400E" />
+        </linearGradient>
+      </defs>
+      <rect x="0.5" y="0.5" width="37" height="27" rx="4.5" fill="url(#emvGrad)" stroke="#B45309" strokeWidth="0.8" />
+      {/* Circuit lines */}
+      <path d="M0.5 9.5H13M0.5 18.5H13M25 9.5H37.5M25 18.5H37.5M13 0.5V27.5M25 0.5V27.5M13 9.5H25M13 18.5H25" stroke="#78350F" strokeWidth="0.65" opacity="0.6" />
+      <rect x="15" y="11" width="8" height="6" rx="1.5" fill="#B45309" opacity="0.3" />
+    </svg>
+  );
+}
+
+// Authentic RuPay Card Emblem
+export function RuPayLogo({ variant = 'white' }) {
+  return (
+    <div className="card-network-badge rupay-badge">
+      <span className="rupay-text">RuPay</span>
+      <span className="rupay-tier">SELECT</span>
+    </div>
+  );
+}
+
+// Authentic VISA Signature Card Emblem
+export function VisaLogo() {
+  return (
+    <div className="card-network-badge visa-badge">
+      <span className="visa-text">VISA</span>
+      <span className="visa-tier">SIGNATURE</span>
+    </div>
+  );
+}
+
+// Luxury Indian Overseas Bank Emblem Badge
+export function IobEmblem({ size = 32 }) {
+  return (
+    <div className="iob-emblem-wrap" style={{ width: size, height: size }}>
+      <img src="/iob_logo.png" alt="Indian Overseas Bank" className="iob-emblem-img" />
+    </div>
+  );
+}
+
 export function HeroDecorativeSvg() {
   return (
     <svg className="auth-bg" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -179,21 +240,6 @@ export function AuthRightGlowSvg() {
       </defs>
       <circle cx="440" cy="40" r="180" fill="url(#formGlow)" />
       <circle cx="30" cy="660" r="160" fill="url(#formGlow)" />
-    </svg>
-  );
-}
-
-export function CardChipSvg() {
-  return (
-    <svg viewBox="0 0 24 18" fill="none">
-      <rect x="0.5" y="0.5" width="23" height="17" rx="3" fill="url(#chipGrad)" stroke="rgba(0,0,0,0.15)" />
-      <path d="M8 0.5V17.5M16 0.5V17.5M0.5 6H23.5M0.5 12H23.5" stroke="rgba(0,0,0,0.18)" strokeWidth="0.6" />
-      <defs>
-        <linearGradient id="chipGrad" x1="0" y1="0" x2="24" y2="18" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ffe9b3" />
-          <stop offset="1" stopColor="#d4af5a" />
-        </linearGradient>
-      </defs>
     </svg>
   );
 }

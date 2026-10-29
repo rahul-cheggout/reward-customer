@@ -7,18 +7,17 @@ import {
   fetchTopGiftCards,
   fetchRewardsBanners,
   getTabName,
-  getTabUrl,
   resolvePwaUrl
 } from '../services/api';
 
-const CYCLE_INTERVAL = 3500;
+const CYCLE_INTERVAL = 3800;
 const MAX_GIFT_CARDS = 4;
 const MAX_SHOP_BANNERS = 4;
 const GIFT_CARD_REGEX = /gift\s*card/i;
 const SHOP_REGEX = /^shop$/i;
 const EXCLUSIVE_OFFERS_REGEX = /exclusive\s*offers?/i;
 
-export function RewardMarketplace() {
+export function RewardMarketplace({ onOpenRedeem }) {
   const navigate = useNavigate();
   const [giftCardTab, setGiftCardTab] = useState(null);
   const [shopTab, setShopTab] = useState(null);
@@ -81,9 +80,17 @@ export function RewardMarketplace() {
   }, []);
 
   const handleTabClick = (tab) => {
+    // If it's a gift card or user wants quick redeem, open the instant redemption modal
+    if (onOpenRedeem && (tab?.type === 'giftCard' || GIFT_CARD_REGEX.test(getTabName(tab)))) {
+      onOpenRedeem();
+      return;
+    }
+
     const targetUrl = resolvePwaUrl(tab);
     if (targetUrl) {
       navigate(`/pwa?url=${encodeURIComponent(targetUrl)}&label=${encodeURIComponent(getTabName(tab))}`);
+    } else if (onOpenRedeem) {
+      onOpenRedeem();
     }
   };
 
@@ -93,16 +100,27 @@ export function RewardMarketplace() {
   const hasShop = shopTab && shopBanners.length > 0;
   const hasExclusive = !!exclusiveTab;
 
-  if (!hasGiftCards && !hasShop && !hasExclusive) return null;
-
   return (
-    <div className="reward-marketplace">
-      <p className="rm-title">Redeem your points</p>
+    <div className="reward-marketplace luxury-card-panel">
+      <div className="rm-header">
+        <h3 className="rm-title">Exclusive Rewards & Offers</h3>
+        <p className="rm-subtitle">Instant gift vouchers and shopping privileges</p>
+      </div>
+
       <div className="rm-rows">
+        {/* Gift Cards Row */}
         {hasGiftCards && (
           <div className="rm-row-block">
-            <p className="rm-row-label">{getTabName(giftCardTab) || 'Gift Cards'}</p>
-            <div className="rm-row" onClick={() => handleTabClick(giftCardTab)}>
+            <div className="rm-row-label-row">
+              <span className="rm-row-label">{getTabName(giftCardTab) || 'Brand Gift Cards'}</span>
+              <span className="deal-badge-green">Instant Code</span>
+            </div>
+            <div
+              className="rm-row luxury-hover-lift"
+              onClick={() => handleTabClick(giftCardTab)}
+              role="button"
+              tabIndex={0}
+            >
               <div className="rm-row-img-wrap rm-row-img-wrap--wide">
                 {giftCardImages.map((imgUrl, idx) => (
                   <img
@@ -113,14 +131,26 @@ export function RewardMarketplace() {
                   />
                 ))}
               </div>
+              <div className="rm-card-overlay">
+                <span className="overlay-cta">Redeem Vouchers ➔</span>
+              </div>
             </div>
           </div>
         )}
 
+        {/* Shop Row */}
         {hasShop && (
           <div className="rm-row-block">
-            <p className="rm-row-label">{getTabName(shopTab) || 'Shop'}</p>
-            <div className="rm-row" onClick={() => handleTabClick(shopTab)}>
+            <div className="rm-row-label-row">
+              <span className="rm-row-label">{getTabName(shopTab) || 'Shop Brands'}</span>
+              <span className="deal-badge-gold">5X Multiplier</span>
+            </div>
+            <div
+              className="rm-row luxury-hover-lift"
+              onClick={() => handleTabClick(shopTab)}
+              role="button"
+              tabIndex={0}
+            >
               <div className="rm-row-img-wrap rm-row-img-wrap--tall">
                 {shopBanners.map((banner, idx) => (
                   <img
@@ -131,20 +161,35 @@ export function RewardMarketplace() {
                   />
                 ))}
               </div>
+              <div className="rm-card-overlay">
+                <span className="overlay-cta">Explore Brands ➔</span>
+              </div>
             </div>
           </div>
         )}
 
+        {/* Exclusive Offers Row */}
         {hasExclusive && (
           <div className="rm-row-block">
-            <p className="rm-row-label">{getTabName(exclusiveTab) || 'Exclusive Offers'}</p>
-            <div className="rm-row" onClick={() => handleTabClick(exclusiveTab)}>
+            <div className="rm-row-label-row">
+              <span className="rm-row-label">{getTabName(exclusiveTab) || 'Exclusive Deals'}</span>
+              <span className="deal-badge-purple">IOB Special</span>
+            </div>
+            <div
+              className="rm-row luxury-hover-lift"
+              onClick={() => handleTabClick(exclusiveTab)}
+              role="button"
+              tabIndex={0}
+            >
               <div className="rm-row-img-wrap rm-row-img-wrap--tall">
                 <img
                   src={EXCLUSIVE_OFFERS_IMG}
                   alt="Exclusive Offers"
                   className="rm-row-img is-active"
                 />
+              </div>
+              <div className="rm-card-overlay">
+                <span className="overlay-cta">View Deals ➔</span>
               </div>
             </div>
           </div>
