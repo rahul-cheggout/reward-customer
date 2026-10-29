@@ -1,0 +1,41 @@
+name: Deploy to Azure Storage Static Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code from GitHub
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      # Step 4: Build project
+      - name: Build project
+        run: npm run build
+
+      # Step 5: Upload build files directly to Azure Storage $web container
+      - name: Deploy to Azure Blob Storage ($web)
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+              --connection-string "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+              --destination '$web' \
+              --source ./dist \
+              --overwrite true
