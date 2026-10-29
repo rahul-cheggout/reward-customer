@@ -151,7 +151,7 @@ export function AppShell() {
             </div>
             <div>
               <span className="brand-name">{bank.name || 'Cheggout Rewards'}</span>
-              <span className="brand-tagline">Rewards, powered by Cheggout</span>
+              <span className="brand-tagline">Rewards, powered by Cheggout • Live via GitHub Actions 🚀</span>
             </div>
           </div>
 
